@@ -1,6 +1,6 @@
 {
 	"FileVersion": 3,
-	"EngineAssociation": "4.26",
+	"EngineAssociation": "{00043584-08DD-7E98-5777-E2ECFA71FB48}",
 	"Category": "",
 	"Description": "",
 	"Modules": [
@@ -123,6 +123,10 @@
 		},
 		{
 			"Name": "HairStrands",
+			"Enabled": true
+		},
+		{
+			"Name": "StreetMap",
 			"Enabled": true
 		}
 	]
