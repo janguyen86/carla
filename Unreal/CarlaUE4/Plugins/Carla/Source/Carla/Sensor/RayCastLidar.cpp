@@ -20,6 +20,8 @@
 #include "DrawDebugHelpers.h"
 #include "Engine/CollisionProfile.h"
 #include "Runtime/Engine/Classes/Kismet/KismetMathLibrary.h"
+#include "TimestampLogger.h"
+#include <chrono>
 
 FActorDefinition ARayCastLidar::GetSensorDefinition()
 {
@@ -58,6 +60,11 @@ void ARayCastLidar::Set(const FLidarDescription &LidarDescription)
 void ARayCastLidar::PostPhysTick(UWorld *World, ELevelTick TickType, float DeltaTime)
 {
   TRACE_CPUPROFILER_EVENT_SCOPE(ARayCastLidar::PostPhysTick);
+  double now = std::chrono::duration<double>(
+    std::chrono::system_clock::now().time_since_epoch()
+  ).count();
+  // TODO: Get frame
+  TimestampLogger::GetInstance().Log("LiDAR Rendering", now, 0);
   SimulateLidar(DeltaTime);
 
   auto DataStream = GetDataStream(*this);
@@ -65,6 +72,13 @@ void ARayCastLidar::PostPhysTick(UWorld *World, ELevelTick TickType, float Delta
 
   {
     TRACE_CPUPROFILER_EVENT_SCOPE_STR("Send Stream");
+
+    double now = std::chrono::duration<double>(
+      std::chrono::system_clock::now().time_since_epoch()
+    ).count();
+    // TODO: Get frame 
+    TimestampLogger::GetInstance().Log("LiDAR SerializedAndSend", now, 0);
+
     DataStream.SerializeAndSend(*this, LidarData, DataStream.PopBufferFromPool());
   }
   // ROS2

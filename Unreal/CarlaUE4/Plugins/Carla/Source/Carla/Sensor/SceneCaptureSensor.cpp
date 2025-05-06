@@ -12,6 +12,8 @@
 #include <mutex>
 #include <atomic>
 #include <thread>
+#include "TimestampLogger.h"
+#include <chrono>
 
 static auto SCENE_CAPTURE_COUNTER = 0u;
 
@@ -450,6 +452,12 @@ float ASceneCaptureSensor::GetChromAberrOffset() const
 void ASceneCaptureSensor::EnqueueRenderSceneImmediate() {
   TRACE_CPUPROFILER_EVENT_SCOPE(ASceneCaptureSensor::EnqueueRenderSceneImmediate);
   // Creates an snapshot of the scene, requieres bCaptureEveryFrame = false.
+  double now = std::chrono::duration<double>(
+    std::chrono::system_clock::now().time_since_epoch()
+  ).count();
+  std::cout << "Logging timestamp..." << std::endl;
+  // TODO: Get frame
+  TimestampLogger::GetInstance().Log("RGB Rendering", now, 0);
   GetCaptureComponent2D()->CaptureScene();
 
   // // Equivalent to "CaptureComponent2D->CaptureScene" + (optional) GBuffer extraction.

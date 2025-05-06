@@ -15,8 +15,11 @@
 #include "Renderer/Public/GBufferView.h"
 
 #include <type_traits>
+#include "TimestampLogger.h"
+#include <chrono>
 
 #include "SceneCaptureSensor.generated.h"
+
 
 
 
@@ -521,6 +524,11 @@ private:
       }
       SCOPE_CYCLE_COUNTER(STAT_CarlaSensorStreamSend);
       TRACE_CPUPROFILER_EVENT_SCOPE_STR("Stream Send");
+      double now = std::chrono::duration<double>(
+        std::chrono::system_clock::now().time_since_epoch()
+      ).count();
+      // TODO: Get frame
+      TimestampLogger::GetInstance().Log("RGB SerializeAndSend", now, 0);
       GBufferStream.SerializeAndSend(
         CameraGBuffer,
         std::move(Buffer),

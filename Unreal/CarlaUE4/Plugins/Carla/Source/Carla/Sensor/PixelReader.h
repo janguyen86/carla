@@ -16,6 +16,8 @@
 #endif
 
 #include "Carla/Game/CarlaEngine.h"
+#include "TimestampLogger.h"
+#include <chrono>
 
 #include <compiler/disable-ue4-macros.h>
 #include <carla/Logging.h>
@@ -217,6 +219,11 @@ void FPixelReader::SendPixelsInRenderThread(TSensor &Sensor, bool use16BitFormat
                 // network
                 SCOPE_CYCLE_COUNTER(STAT_CarlaSensorStreamSend);
                 TRACE_CPUPROFILER_EVENT_SCOPE_STR("Stream Send");
+                double now = std::chrono::duration<double>(
+                  std::chrono::system_clock::now().time_since_epoch()
+                ).count();
+                // TODO: Get frame
+                TimestampLogger::GetInstance().Log("RGB Send to Stream", now, 0);
                 Stream.Send(Sensor, BufView);
               }
             }
