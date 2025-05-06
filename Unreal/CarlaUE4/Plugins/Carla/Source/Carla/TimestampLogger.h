@@ -7,7 +7,7 @@ class TimestampLogger {
 public:
     static TimestampLogger& GetInstance();
 
-    void Log(const std::string& event, double timestamp);
+    void Log(const std::string& event, double timestamp, int frame);
 
 private:
     TimestampLogger();

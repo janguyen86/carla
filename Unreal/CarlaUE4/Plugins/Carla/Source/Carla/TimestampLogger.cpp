@@ -5,7 +5,7 @@
 TimestampLogger::TimestampLogger() : header_written_(false) {
     log_file_.open("/home/janice/carla/carla_timestamps.csv", std::ios::out | std::ios::app);
     if (log_file_.is_open()) {
-        log_file_ << "Event,Timestamp (s)\n";  // Write header once
+        log_file_ << "Frame,Timestamp,Event,Agent type\n";  // Write header once
         header_written_ = true;
     }
 }
@@ -21,9 +21,9 @@ TimestampLogger& TimestampLogger::GetInstance() {
     return instance;
 }
 
-void TimestampLogger::Log(const std::string& event, double timestamp) {
+void TimestampLogger::Log(const std::string& event, double timestamp, int frame) {
     std::lock_guard<std::mutex> lock(log_mutex_);
     if (log_file_.is_open()) {
-        log_file_ << event << "," << std::fixed << timestamp << "\n";
+        log_file_ << frame << "," << std::fixed << timestamp << "," << event << "," << "server" << "\n";
     }
 }
