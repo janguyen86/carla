@@ -290,6 +290,8 @@ class World(object):
         self.gnss_sensor = GnssSensor(self.player)
         self.imu_sensor = IMUSensor(self.player)
         self.camera_manager = CameraManager(self.player, self.hud, self._gamma)
+        self.lidar_manager = LidarManager(self.player, self.hud)
+        self.lidar_manager.attach_lidar()
         self.camera_manager.transform_index = cam_pos_index
         self.camera_manager.set_sensor(cam_index, notify=False)
         actor_type = get_actor_display_name(self.player)
@@ -366,7 +368,38 @@ class World(object):
         if self.player is not None:
             self.player.destroy()
 
+class LidarManager(object): 
+    def __init__(self, parent_actor, hud): 
+        self.sensor = None
+        self._parent = parent_actor
+        self.hud = hud
+        self.lidar_sensor = None
 
+    # Function to spawn a LiDAR sensor
+    def attach_lidar(self):
+        vehicle = self._parent
+        world = vehicle.get_world()
+        blueprint_library = world.get_blueprint_library()
+        lidar_bp = blueprint_library.find('sensor.lidar.ray_cast')
+
+        # Set LiDAR attributes (customize as needed)
+        lidar_bp.set_attribute('range', '50')  
+        lidar_bp.set_attribute('rotation_frequency', '10')
+        lidar_bp.set_attribute('channels', '32')
+        lidar_bp.set_attribute('points_per_second', '500000')
+
+        # Attach the sensor to the vehicle
+        lidar_transform = carla.Transform(carla.Location(x=0, y=0, z=2))  # Adjust location
+        self.lidar_sensor = world.spawn_actor(lidar_bp, lidar_transform, attach_to=vehicle)
+
+        # Add a callback function to process LiDAR data
+        def lidar_callback(point_cloud):
+            print("Received LiDAR data")
+
+        self.lidar_sensor.listen(lambda data: lidar_callback(data))
+
+        return self.lidar_sensor
+    
 # ==============================================================================
 # -- KeyboardControl -----------------------------------------------------------
 # ==============================================================================
